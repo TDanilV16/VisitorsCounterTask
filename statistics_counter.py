@@ -1,10 +1,45 @@
-def count_global():
-    with open("stats.txt", "r") as f:
-        old_data = f.read()
-        counter = int(old_data)
-    with open("stats.txt", "w") as f:
-        new_data = old_data.replace(str(counter), str(counter + 1))
-        f.write(new_data)
-    f.close()
+import sqlite3 as sql
+import datetime as dt
 
-    return counter
+
+def write_in_table(entities):
+    db = sql.connect("data.sqlite")
+
+    cursor = db.cursor()
+
+    cursor.execute("INSERT INTO Visitors VALUES(?, ?)", entities)
+
+    db.commit()
+
+    db.close()
+
+
+def count_global():
+    db = sql.connect("data.sqlite")
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Visitors")
+    total = len(cursor.fetchall())
+    db.close()
+
+    return total
+
+
+def count_for_today():
+    today = dt.date.today().strftime("%d/%m/%y")
+    db = sql.connect("data.sqlite")
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Visitors WHERE date = ?;", (today,))
+    count = len(cursor.fetchall())
+    db.close()
+
+    return count
+
+
+def count_unique():
+    db = sql.connect("data.sqlite")
+    cursor = db.cursor()
+    cursor.execute("SELECT DISTINCT ip FROM Visitors")
+    count = len(cursor.fetchall())
+    db.close()
+
+    return count
