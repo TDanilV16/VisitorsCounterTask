@@ -2,6 +2,10 @@ import sqlite3 as sql
 import datetime as dt
 
 
+def get_today_date():
+    return dt.date.today().strftime("%d/%m/%y")
+
+
 def write_in_table(entities):
     db = sql.connect("data.sqlite")
 
@@ -26,7 +30,7 @@ def count_global():
 
 
 def count_for_today():
-    today = dt.date.today().strftime("%d/%m/%y")
+    today = get_today_date()
     db = sql.connect("data.sqlite")
     cursor = db.cursor()
     cursor\
@@ -38,7 +42,7 @@ def count_for_today():
 
 
 def count_for_month():
-    today = dt.date.today().strftime("%d/%m/%y")
+    today = get_today_date()
     month = today.split('/')[1]
     db = sql.connect("data.sqlite")
     cursor = db.cursor()
@@ -51,7 +55,7 @@ def count_for_month():
 
 
 def count_for_year():
-    today = dt.date.today().strftime("%d/%m/%y")
+    today = get_today_date()
     year = today.split('/')[2]
     db = sql.connect("data.sqlite")
     cursor = db.cursor()
@@ -75,7 +79,7 @@ def count_unique():
 
 
 def count_unique_for_today():
-    today = dt.date.today().strftime("%d/%m/%y")
+    today = get_today_date()
     db = sql.connect("data.sqlite")
     cursor = db.cursor()
     cursor\
@@ -87,11 +91,12 @@ def count_unique_for_today():
 
 
 def count_unique_for_month():
-    today = dt.date.today().strftime("%d/%m/%y")
+    today = get_today_date()
     db = sql.connect("data.sqlite")
     cursor = db.cursor()
     month = today.split('/')[1]
-    string = f'/{month}/'
+    year = today.split('/')[2]
+    string = f'/{month}/{year}'
     cursor\
         .execute("SELECT DISTINCT ip FROM Visitors WHERE instr(date, ?)", (string,))
     count = len(cursor.fetchall())
@@ -100,7 +105,7 @@ def count_unique_for_month():
 
 
 def count_unique_for_this_year():
-    today = dt.date.today().strftime("%d/%m/%y")
+    today = get_today_date()
     db = sql.connect("data.sqlite")
     cursor = db.cursor()
     year = today.split('/')[2]
