@@ -2,7 +2,6 @@ import datetime
 from string import Template
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-import threading
 import statistics_counter
 
 app = FastAPI()
@@ -12,8 +11,12 @@ app = FastAPI()
 async def root(request: Request):
     client_host = request.client.host
     today = statistics_counter.get_today_date()
-
-    entity = (client_host, today)
+    now = datetime.datetime.now()
+    hour = now.hour
+    minute = now.minute
+    second = now.second
+    weekday = statistics_counter.get_weekday(now.year, now.month, now.day)
+    entity = (client_host, today, hour, minute, second, weekday)
     statistics_counter.write_in_table(entity)
 
     print(f"New visitor: {client_host}")
@@ -39,6 +42,12 @@ async def root(request: Request):
            .substitute(total_visits_for_month=statistics_counter.count_for_month())}</h1>
                 <h1>{Template("All visitors for this year: $total_visits_for_year")
            .substitute(total_visits_for_year=statistics_counter.count_for_year())}</h1>
+           <h1>{Template("All visitors for December: $total_visits_for_december")
+           .substitute(total_visits_for_december=statistics_counter.count_visitors_for_month(12))}</h1>
+           <h1>{Template("All visitors for Monday: $total_visits_for_monday")
+           .substitute(total_visits_for_monday=statistics_counter.count_visitors_for_weekday("Monday"))}</h1>
+           <h1>{Template("All visitors for 8 PM: $total_visits_for_hour")
+           .substitute(total_visits_for_hour=statistics_counter.count_visitors_for_hour(20))}</h1>
             </body>
         </html>
         """)
